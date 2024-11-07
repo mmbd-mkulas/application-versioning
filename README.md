@@ -56,6 +56,32 @@ php artisan application-version:increase-minor
 php artisan application-version:increase-patch 
 ```
 
+Automatically Retrieve the Current Git Tag
+
+To ensure that your application’s version is automatically updated based on the current Git tag whenever the application boots, you can add a call to the getActualGitTag() method from ApplicationVersioningServiceProvider in the boot() method of the AppServiceProvider.
+
+Steps:
+
+	1.	Open the AppServiceProvider class located in the app/Providers directory.
+	2.	Add the method call in the boot() function.
+
+Code Example:
+
+    namespace App\Providers;
+
+    use Illuminate\Support\ServiceProvider;
+    use DrobnyDev\ApplicationVersioning\ApplicationVersioningServiceProvider;
+
+    class AppServiceProvider extends ServiceProvider
+    {
+        public function boot()
+        {
+            // Automatically retrieve and update the current Git tag
+            ApplicationVersioningServiceProvider::getActualGitTag();
+        }
+    }
+
+
 ## Testing
 
 ```bash

@@ -10,6 +10,7 @@ use Exception;
 use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
+use Illuminate\Support\Facades\File;
 
 class ApplicationVersioningServiceProvider extends PackageServiceProvider
 {
@@ -53,5 +54,23 @@ class ApplicationVersioningServiceProvider extends PackageServiceProvider
                     ->publishConfigFile()
                     ->askToStarRepoOnGitHub('misodrobny/application-versioning');
             });
+    }
+
+
+    public static function getActualGitTag(): void
+    {
+        $latestTag = trim(shell_exec('cd ' . base_path() . ' && git describe --tags --abbrev=0'));
+
+        if ($latestTag) {
+            [$major, $minor, $patch] = explode('.', $latestTag);
+
+            $versionContent = "version:\n" .
+                "  current: { major: $major, minor: $minor, patch: $patch, format: \"\$major.\$minor.\$patch - \$git_hash\" }";
+        } else {
+            $versionContent = "version:\n" .
+                "  current: { major: 0, minor: 0, patch: 1, format: \"0.0.1 - \$git_hash\" }";
+        }
+
+        File::put(base_path('version.yaml'), $versionContent);
     }
 }
